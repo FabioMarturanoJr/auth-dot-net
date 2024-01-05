@@ -1,6 +1,7 @@
 using AuthJwt.Infrastructure.Context;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,13 +15,14 @@ builder.Services.AddSwaggerGen();
 // Services
 
 // Context
-builder.Services.AddDbContext<AppDbContext>(options => 
-    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), 
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
+
 
 var app = builder.Build();
 
