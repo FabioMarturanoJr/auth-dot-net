@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AuthJwt.Domain\AuthJwt.Domain.csproj" />
     <ProjectReference Include="..\AuthJwt.Infrastructure\AuthJwt.Infrastructure.csproj" />
   </ItemGroup>
 
