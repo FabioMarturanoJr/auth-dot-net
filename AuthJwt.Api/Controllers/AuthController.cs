@@ -1,4 +1,5 @@
 using AuthJwt.Domain.Dtos;
+using AuthJwt.Service.Sevices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,60 +10,42 @@ namespace AuthJwt.Controllers
     public class AuthController : ControllerBase
     {
 
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly IAuthService _authService;
 
-        public AuthController(
-            UserManager<IdentityUser> userManager, 
-            SignInManager<IdentityUser> signInManager)
+        public AuthController(IAuthService authService)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            _authService = authService;
         }
 
         [HttpGet("[action]")]
-        public string TestApi()
-        {
-            return $"Api testada em {DateTime.Now.ToLongDateString()}";
+        public string TestApi() => $"Api testada em {DateTime.Now.ToLongDateString()}";
             
-        }
-
         [HttpPost("[action]")]
-        public async Task<ActionResult> RegistrarUsuario([FromBody] UserDto model)
+        public async Task<ActionResult> RegistrarUsuario([FromBody] CreateUserDto model)
         {
-
-            var user = new IdentityUser 
-            { 
-                UserName = model.Email, 
-                Email = model.Email,
-                EmailConfirmed = true
-            };
-
-            if (!string.Equals(model.Password, model.ConfirmPassword, StringComparison.OrdinalIgnoreCase))
+            try
             {
-                return BadRequest(new Exception("Confime a senha"));
-            }
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
-            await _signInManager.SignInAsync(user, false);
-            return Ok();
-        }
-
-        [HttpPost("[action]")]
-        public async Task<ActionResult> Login([FromBody] UserDto userInfo)
-        {
-            var result = await _signInManager.PasswordSignInAsync(userInfo.Email, userInfo.Password, false, false);
-
-            if (result.Succeeded)
-            {
+                await _authService.RegistrarUsuario(model);
                 return Ok();
             }
-            return BadRequest(new Exception("Login Inválido"));
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Data);
+            }
+        }
+
+        [HttpPost("[action]")]
+        public async Task<ActionResult> Login([FromBody] LoginUserDto userInfo)
+        {
+            try
+            {
+                await _authService.Login(userInfo);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Data);
+            }
         }
     }
 }

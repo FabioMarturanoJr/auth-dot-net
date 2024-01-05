@@ -1,4 +1,5 @@
 using AuthJwt.Infrastructure.Context;
+using AuthJwt.Service.Sevices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
@@ -13,6 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Services
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Context
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
