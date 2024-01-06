@@ -1,5 +1,7 @@
 using AuthJwt.Domain.Dtos;
 using AuthJwt.Service.Sevices;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +19,7 @@ namespace AuthJwt.Controllers
             _authService = authService;
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("[action]")]
         public string TestApi() => $"Api testada em {DateTime.Now.ToLongDateString()}";
             
@@ -25,12 +28,11 @@ namespace AuthJwt.Controllers
         {
             try
             {
-                await _authService.RegistrarUsuario(model);
-                return Ok();
+                return Ok(await _authService.RegistrarUsuario(model));
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Data);
+                return BadRequest(ex.Data.Count == 0 ? ex.Message : ex.Data);
             }
         }
 
@@ -39,12 +41,11 @@ namespace AuthJwt.Controllers
         {
             try
             {
-                await _authService.Login(userInfo);
-                return Ok();
+                return Ok(await _authService.Login(userInfo));
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Data);
+                return BadRequest(ex.Data.Count == 0 ? ex.Message : ex.Data);
             }
         }
     }
