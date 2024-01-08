@@ -59,9 +59,8 @@ public class AuthService : IAuthService
             err.Data["Error"] = result.Errors;
             throw err;
         }
-        // await _signInManager.SignInAsync(user, false);
-        await EnviarEmailVeriricacao(user, baseUrl);
 
+        await EnviarEmailVeriricacao(user, baseUrl);
         return await GerarToken(model);
     }
 
