@@ -56,18 +56,23 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 var tokenConfigSection = builder.Configuration.GetSection(nameof(TokenConfig));
 var tokenConfig = tokenConfigSection.Get<TokenConfig>();
 
-builder.Services.AddAuthentication(
-    JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(op =>
-        op.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidAudience = tokenConfig.Audience,
-            ValidIssuer = tokenConfig.Issuer,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenConfig.JwtKey))
-        });
+builder.Services.AddAuthentication(op =>
+{
+    op.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    op.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    op.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(op =>
+    op.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidAudience = tokenConfig.Audience,
+        ValidIssuer = tokenConfig.Issuer,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenConfig.JwtKey))
+    });
 
 builder.Services.Configure<TokenConfig>(tokenConfigSection);
 
@@ -84,6 +89,10 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseCors(op => op.AllowAnyOrigin()
+    .AllowAnyMethod()
+        .AllowAnyHeader());
 
 app.MapControllers();
 
