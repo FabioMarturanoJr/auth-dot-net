@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Web;
 
 namespace AuthJwt.Service.Sevices;
 
@@ -58,7 +59,7 @@ public class AuthService : IAuthService
             err.Data["Error"] = result.Errors;
             throw err;
         }
-        await _signInManager.SignInAsync(user, false);
+        // await _signInManager.SignInAsync(user, false);
         await EnviarEmailVeriricacao(user, baseUrl);
 
         return await GerarToken(model);
@@ -67,7 +68,8 @@ public class AuthService : IAuthService
     private async Task EnviarEmailVeriricacao(IdentityUser user, string baseUrl)
     {
         var token = await  _userManager.GenerateEmailConfirmationTokenAsync(user);
-        var link = $"{baseUrl}?token={token}&email={user.Email}";
+        string codeEncoded = HttpUtility.UrlEncode(token);
+        var link = $"{baseUrl}?token={codeEncoded}&email={user.Email}";
         var message = new EmailDto(new List<string> { user.Email }, "ConfirmationLink", link);
         _emailService.EnviarEmail(message);
     }

@@ -46,7 +46,7 @@ namespace AuthJwt.Controllers
             try
             {
                 await _authService.ConfirmEmail(token, email);
-                return Ok();
+                return Ok("Email Confirmado com sucesso");
             }
             catch (Exception ex)
             {
