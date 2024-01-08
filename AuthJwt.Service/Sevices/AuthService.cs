@@ -1,7 +1,9 @@
 ﻿using AuthJwt.Domain.Auth;
 using AuthJwt.Domain.Configurations;
 using AuthJwt.Domain.Dtos;
+using AuthJwt.Service.Dto;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -18,23 +20,27 @@ public class AuthService : IAuthService
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly TokenConfig _tokenConfig;
 
+    private readonly IEmailService _emailService;
+
     public AuthService(UserManager<IdentityUser> userManager,
         SignInManager<IdentityUser> signInManager,
         IOptions<TokenConfig> tokenConfig,
-        RoleManager<IdentityRole> roleManager)
+        RoleManager<IdentityRole> roleManager,
+        IEmailService emailService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _tokenConfig = tokenConfig.Value;
         _roleManager = roleManager;
+        _emailService = emailService;
     }
-    public async Task<UserToken> RegistrarUsuario(CreateUserDto model)
+    public async Task<UserToken> RegistrarUsuario(CreateUserDto model, string baseUrl)
     {
         var user = new IdentityUser
         {
             UserName = model.Email,
             Email = model.Email,
-            EmailConfirmed = true
+            EmailConfirmed = false
         };
 
         if (!string.Equals(model.Password, model.ConfirmPassword, StringComparison.OrdinalIgnoreCase))
@@ -53,7 +59,32 @@ public class AuthService : IAuthService
             throw err;
         }
         await _signInManager.SignInAsync(user, false);
+        await EnviarEmailVeriricacao(user, baseUrl);
+
         return await GerarToken(model);
+    }
+
+    private async Task EnviarEmailVeriricacao(IdentityUser user, string baseUrl)
+    {
+        var token = await  _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var link = $"{baseUrl}?token={token}&email={user.Email}";
+        var message = new EmailDto(new List<string> { user.Email }, "ConfirmationLink", link);
+        _emailService.EnviarEmail(message);
+    }
+
+    public async Task ConfirmEmail(string token, string email)
+    {
+        var user = await _userManager.FindByNameAsync(email);
+        if (user != null)
+        {
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (!result.Succeeded)
+            {
+                var err = new Exception();
+                err.Data["Error"] = result.Errors;
+                throw err;
+            }
+        }
     }
 
     public async Task<UserToken> Login(LoginUserDto userInfo)

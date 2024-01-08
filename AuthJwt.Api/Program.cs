@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Org.BouncyCastle.Crypto.Tls;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,6 +43,7 @@ builder.Services.AddSwaggerGen(config =>
 
 // Services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Context
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -51,6 +53,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.Configure<IdentityOptions>(op => op.SignIn.RequireConfirmedEmail = true);
 
 // Jwt
 var tokenConfigSection = builder.Configuration.GetSection(nameof(TokenConfig));
@@ -74,8 +78,10 @@ builder.Services.AddAuthentication(op =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenConfig.JwtKey))
     });
 
-builder.Services.Configure<TokenConfig>(tokenConfigSection);
 
+// Configurations
+builder.Services.Configure<TokenConfig>(tokenConfigSection);
+builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection(nameof(EmailConfig)));
 
 var app = builder.Build();
 
