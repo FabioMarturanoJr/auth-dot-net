@@ -47,6 +47,33 @@ namespace AuthJwt.Api.Controllers
             }
         }
 
+        [HttpPost("[action]")]
+        public async Task<ActionResult> AtualizaSenha([FromBody] AtualizaSenhaDto atualizaSenha)
+        {
+            try
+            {
+                await _authService.AtualizaSenha(atualizaSenha);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Data.Count == 0 ? ex.Message : ex.Data);
+            }
+        }
+
+        [HttpDelete("[action]/id")]
+        public async Task<ActionResult> DeleteUsuario(string id)
+        {
+            try
+            {
+                return Ok(await _authService.DeleteUsuario(id));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Data.Count == 0 ? ex.Message : ex.Data);
+            }
+        }
+
         [HttpGet("[action]")]
         public async Task<ActionResult<List<UserRolesDtos>>> ListarUsuarios() => await _authService.ListarUsuarios();
 

@@ -71,13 +71,13 @@ public class AuthService : IAuthService
 
     public async Task AddRoleUsuario(string userEmail, string role)
     {
-        var usuario = await ValidaEmailERole(userEmail, role);
+        var usuario = await ValidaEmailRole(userEmail, role);
         await _userManager.AddToRoleAsync(usuario, role);
     }
 
     public async Task RemoveRoleUsuario(string userEmail, string role)
     {
-        var usuario = await ValidaEmailERole(userEmail, role);
+        var usuario = await ValidaEmailRole(userEmail, role);
         await _userManager.RemoveFromRoleAsync(usuario, role);
     }
 
@@ -89,6 +89,7 @@ public class AuthService : IAuthService
         {
             usersRoles.Add(
                 new UserRolesDtos { 
+                    Id = user.Id,
                     User = user.Email, 
                     Roles = await _userManager.GetRolesAsync(user) });
         }
@@ -100,7 +101,26 @@ public class AuthService : IAuthService
         return await _roleManager.Roles.Select(role => role.Name).ToListAsync();
     }
 
-    private async Task<IdentityUser> ValidaEmailERole(string userEmail, string role)
+    public async Task AtualizaSenha(AtualizaSenhaDto dto)
+    {
+        var user = await _userManager.FindByIdAsync(dto.Id);
+        var result =  await _userManager.ChangePasswordAsync(user, dto.SenhaAntiga, dto.SenhaNova);
+        if (!result.Succeeded)
+        {
+            var err = new Exception();
+            err.Data["Error"] = result.Errors;
+            throw err;
+        }
+    }
+
+    public async Task<IdentityUser> DeleteUsuario(string id)
+    {
+        var usuario = await _userManager.FindByIdAsync(id);
+        await _userManager.DeleteAsync(usuario);
+        return usuario;
+    }
+
+    private async Task<IdentityUser> ValidaEmailRole(string userEmail, string role)
     {
         if (!await _roleManager.RoleExistsAsync(role))
         {
