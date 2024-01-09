@@ -82,6 +82,24 @@ namespace AuthJwt.Infrastructure.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "cebce4e7-7814-40ff-a88a-ce3d013b5a72",
+                            Email = "admin@admin.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@ADMIN.COM",
+                            NormalizedUserName = "ADMIN@ADMIN.COM",
+                            PasswordHash = "AQAAAAEAACcQAAAAEFMqVS7Syo+Ruu6hl/OkvJvTK+/Pcw7ePy4EcccmFZQ/xTtik2Z63PIbd4lmr1ORww==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "DYPRIWGBDHXXKDPBWP5PWYJK3LPV7NG5",
+                            TwoFactorEnabled = false,
+                            UserName = "admin@admin.com"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
@@ -210,6 +228,13 @@ namespace AuthJwt.Infrastructure.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1,
+                            RoleId = 1
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>

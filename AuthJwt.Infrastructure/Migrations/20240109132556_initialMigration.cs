@@ -204,6 +204,16 @@ namespace AuthJwt.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[] { 2, "2", "User", "USER" });
 
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[] { 1, 0, "cebce4e7-7814-40ff-a88a-ce3d013b5a72", "admin@admin.com", true, false, null, "ADMIN@ADMIN.COM", "ADMIN@ADMIN.COM", "AQAAAAEAACcQAAAAEFMqVS7Syo+Ruu6hl/OkvJvTK+/Pcw7ePy4EcccmFZQ/xTtik2Z63PIbd4lmr1ORww==", null, false, "DYPRIWGBDHXXKDPBWP5PWYJK3LPV7NG5", false, "admin@admin.com" });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId", "CustomIdentityUserId" },
+                values: new object[] { 1, 1, null });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
