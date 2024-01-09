@@ -1,9 +1,9 @@
 ﻿using AuthJwt.Domain.Auth;
 using AuthJwt.Domain.Configurations;
 using AuthJwt.Domain.Dtos;
+using AuthJwt.Infrastructure.Model;
 using AuthJwt.Service.Dto;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -16,17 +16,17 @@ namespace AuthJwt.Service.Sevices;
 
 public class AuthService : IAuthService
 {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly SignInManager<IdentityUser> _signInManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly UserManager<CustomIdentityUser> _userManager;
+    private readonly SignInManager<CustomIdentityUser> _signInManager;
+    private readonly RoleManager<IdentityRole<int>> _roleManager;
     private readonly TokenConfig _tokenConfig;
 
     private readonly IEmailService _emailService;
 
-    public AuthService(UserManager<IdentityUser> userManager,
-        SignInManager<IdentityUser> signInManager,
+    public AuthService(UserManager<CustomIdentityUser> userManager,
+        SignInManager<CustomIdentityUser> signInManager,
         IOptions<TokenConfig> tokenConfig,
-        RoleManager<IdentityRole> roleManager,
+        RoleManager<IdentityRole<int>> roleManager,
         IEmailService emailService)
     {
         _userManager = userManager;
@@ -37,7 +37,7 @@ public class AuthService : IAuthService
     }
     public async Task<UserToken> RegistrarUsuario(CreateUserDto model, string baseUrl)
     {
-        var user = new IdentityUser
+        var user = new CustomIdentityUser
         {
             UserName = model.Email,
             Email = model.Email,
@@ -64,7 +64,7 @@ public class AuthService : IAuthService
         return await GerarToken(model);
     }
 
-    private async Task EnviarEmailVeriricacao(IdentityUser user, string baseUrl)
+    private async Task EnviarEmailVeriricacao(CustomIdentityUser user, string baseUrl)
     {
         var token = await  _userManager.GenerateEmailConfirmationTokenAsync(user);
         string codeEncoded = HttpUtility.UrlEncode(token);
@@ -145,14 +145,14 @@ public class AuthService : IAuthService
         }
     }
 
-    public async Task<IdentityUser> DeleteUsuario(string id)
+    public async Task<CustomIdentityUser> DeleteUsuario(string id)
     {
         var usuario = await _userManager.FindByIdAsync(id);
         await _userManager.DeleteAsync(usuario);
         return usuario;
     }
 
-    private async Task<IdentityUser> ValidaEmailRole(string userEmail, string role)
+    private async Task<CustomIdentityUser> ValidaEmailRole(string userEmail, string role)
     {
         if (!await _roleManager.RoleExistsAsync(role))
         {

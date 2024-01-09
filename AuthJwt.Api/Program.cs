@@ -1,12 +1,12 @@
 ﻿using AuthJwt.Domain.Configurations;
 using AuthJwt.Infrastructure.Context;
+using AuthJwt.Infrastructure.Model;
 using AuthJwt.Service.Sevices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Org.BouncyCastle.Crypto.Tls;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,11 +50,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<CustomIdentityUser, IdentityRole<int>>(op => op.SignIn.RequireConfirmedEmail = true)
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.Configure<IdentityOptions>(op => op.SignIn.RequireConfirmedEmail = true);
 
 // Jwt
 var tokenConfigSection = builder.Configuration.GetSection(nameof(TokenConfig));

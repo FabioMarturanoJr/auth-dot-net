@@ -1,7 +1,6 @@
 ﻿using AuthJwt.Domain.Auth;
 using AuthJwt.Domain.Dtos;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Routing;
+using AuthJwt.Infrastructure.Model;
 
 namespace AuthJwt.Service.Sevices;
 
@@ -13,7 +12,7 @@ public interface IAuthService
     Task RemoveRoleUsuario(string userEmail, string role);
     Task<List<UserRolesDtos>> ListarUsuarios();
     Task<List<string>> ListarRoles();
-    Task<IdentityUser> DeleteUsuario(string id);
+    Task<CustomIdentityUser> DeleteUsuario(string id);
     Task AtualizaSenha(AtualizaSenhaDto dto);
     Task ConfirmEmail(string token, string email);
 }

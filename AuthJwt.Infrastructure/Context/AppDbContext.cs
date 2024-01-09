@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AuthJwt.Infrastructure.Model;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace AuthJwt.Infrastructure.Context;
 
-public class AppDbContext : IdentityDbContext
+public class AppDbContext : IdentityDbContext<CustomIdentityUser, IdentityRole<int>, int>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -16,9 +18,9 @@ public class AppDbContext : IdentityDbContext
 
     private static void SeedRoles(ModelBuilder builder)
     {
-        builder.Entity<IdentityRole>().HasData(
-            new IdentityRole() { Name = "Admin", ConcurrencyStamp = "1", NormalizedName = "ADMIN" }, 
-            new IdentityRole() { Name = "User", ConcurrencyStamp = "2", NormalizedName = "USER" }
+        builder.Entity<IdentityRole<int>>().HasData(
+            new IdentityRole<int>() {  Id = 1, Name = "Admin", ConcurrencyStamp = "1", NormalizedName = "ADMIN" }, 
+            new IdentityRole<int>() { Id = 2, Name = "User", ConcurrencyStamp = "2", NormalizedName = "USER" }
         );
     }
 }
