@@ -25,7 +25,7 @@ As principais tecnologias e conceitos utilizados foram:
 
 para subir o banco é nescessário roda o comando `dotnet ef database update` na pasta `AuthJwt.Api`
 
-### `User: admin@admin.com Senha: @dmin123`
+### `User: admin@admin.com Senha: @Dmin123`
 
 Usuario Admin com Role Admin disponível para utilizar as rotas do controller Adm
 
