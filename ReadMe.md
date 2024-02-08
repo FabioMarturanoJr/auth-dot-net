@@ -12,7 +12,7 @@ As principais tecnologias e conceitos utilizados foram:
  - Confimação de email
  - Migrations
  - Mysql
- - Arquitetura separada por subprojetos
+ - Arquitetura Clean Architecture
 
 ## Rodar Projeto
 
